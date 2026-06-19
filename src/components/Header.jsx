@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StaggeredMenu from './StaggeredMenu';
 
-const Header = () => {
+const Header = ({ currentServiceId, onNavigateHome, startAnimation }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -13,12 +13,18 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavLinkClick = (e, link) => {
+    if (currentServiceId) {
+      e.preventDefault();
+      onNavigateHome(link);
+    }
+  };
+
   const menuItems = [
     { label: 'Accueil', ariaLabel: 'Aller à l\'accueil', link: '#' },
     { label: 'À propos', ariaLabel: 'En savoir plus sur nous', link: '#about' },
     { label: 'Services', ariaLabel: 'Voir nos services', link: '#services-section' },
     { label: 'Portfolio', ariaLabel: 'Voir notre portfolio', link: '#portfolio' },
-    { label: 'Contact', ariaLabel: 'Nous contacter', link: '#contact' }
   ];
 
   const socialItems = [
@@ -31,15 +37,18 @@ const Header = () => {
     <>
       {/* Desktop Header */}
       <header 
-        className={`hidden md:block fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b ${
+        className={`hidden md:block fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b ${
           isScrolled 
             ? 'bg-[#0A0B10]/80 backdrop-blur-md py-4 border-white/10 shadow-lg' 
             : 'bg-transparent py-6 border-transparent'
-        }`}
+        } ${startAnimation ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}
       >
         <div className="flex items-center justify-between px-6 max-w-7xl mx-auto w-full relative">
           {/* Logo */}
-          <div className="flex items-center gap-2 pointer-events-auto">
+          <div 
+            onClick={(e) => handleNavLinkClick(e, '#')}
+            className="flex items-center gap-2 pointer-events-auto cursor-pointer"
+          >
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#90EE90] to-green-800 flex items-center justify-center">
               <div className="w-4 h-4 rounded-full bg-[#0A0B10]"></div>
             </div>
@@ -48,11 +57,10 @@ const Header = () => {
           
           {/* Desktop Nav */}
           <nav className="flex items-center gap-8 text-sm text-gray-300 absolute left-1/2 -translate-x-1/2 pointer-events-auto">
-            <a href="#" className="hover:text-white transition-colors">Accueil</a>
-            <a href="#about" className="hover:text-white transition-colors">À propos</a>
-            <a href="#services-section" className="hover:text-white transition-colors">Services</a>
-            <a href="#portfolio" className="hover:text-white transition-colors">Portfolio</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <a href="#" onClick={(e) => handleNavLinkClick(e, '#')} className="hover:text-white transition-colors">Accueil</a>
+            <a href="#about" onClick={(e) => handleNavLinkClick(e, '#about')} className="hover:text-white transition-colors">À propos</a>
+            <a href="#services-section" onClick={(e) => handleNavLinkClick(e, '#services-section')} className="hover:text-white transition-colors">Services</a>
+            <a href="#portfolio" onClick={(e) => handleNavLinkClick(e, '#portfolio')} className="hover:text-white transition-colors">Portfolio</a>
           </nav>
           
           {/* Desktop Actions */}
@@ -67,11 +75,11 @@ const Header = () => {
 
       {/* Mobile Header */}
       <div 
-        className={`md:hidden fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b h-[70px] flex items-center ${
+        className={`md:hidden fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b h-[70px] flex items-center ${
           isScrolled 
             ? 'bg-[#0A0B10]/95 backdrop-blur-md border-white/10 shadow-lg' 
             : 'bg-transparent border-transparent'
-        }`}
+        } ${startAnimation ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}
       >
         <div className="w-full h-full relative">
           <StaggeredMenu
@@ -86,6 +94,7 @@ const Header = () => {
             colors={['#0A0B10', '#161822']}
             logoUrl=""
             accentColor="#90EE90"
+            onItemClick={handleNavLinkClick}
           />
         </div>
       </div>

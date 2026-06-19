@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Hero = () => {
+const Hero = ({ onSelectService, startAnimation }) => {
     const image1Ref = useRef(null);
     const image2Ref = useRef(null);
     const image3Ref = useRef(null);
@@ -24,6 +24,8 @@ const Hero = () => {
     }, []);
 
     useLayoutEffect(() => {
+        if (!startAnimation) return;
+
         let ctx = gsap.context(() => {
             // Animate buttons entrance on load
             if (buttonsRef.current) {
@@ -36,7 +38,7 @@ const Hero = () => {
                     y: 0,
                     scale: 1,
                     duration: 1.2,
-                    delay: 1.0,
+                    delay: 0.4,
                     stagger: 0.15,
                     ease: "power4.out"
                 });
@@ -124,7 +126,7 @@ const Hero = () => {
         });
 
         return () => ctx.revert();
-    }, []);
+    }, [startAnimation]);
 
     return (
         <div className="relative min-h-screen flex flex-col font-sans bg-[#0A0B10] pt-20 z-20">
@@ -133,45 +135,59 @@ const Hero = () => {
 
 
             {/* Main Content */}
-            <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between px-8 max-w-7xl mx-auto w-full pt-4 md:pt-10 pb-12 md:pb-24 gap-6 md:gap-12">
+            <main className="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-center lg:justify-between px-8 max-w-7xl mx-auto w-full pt-4 md:pt-10 pb-12 md:pb-24 gap-12 lg:gap-12">
                 {/* Left Content */}
                 <div className="max-w-2xl z-20 flex flex-col items-center md:items-start w-full">
                     <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight mb-6 flex flex-col items-center md:items-start text-center md:text-left">
-                        <span className="block text-white">
-                            <SplitText
-                                text="Installation"
-                                className="inline"
-                                tag="span"
-                                textAlign={isMobile ? "center" : "left"}
-                                delay={40}
-                                duration={1.2}
-                            />
+                        <span className="block text-white min-h-[1.1em]">
+                            {startAnimation ? (
+                                <SplitText
+                                    text="Installation"
+                                    className="inline"
+                                    tag="span"
+                                    textAlign={isMobile ? "center" : "left"}
+                                    delay={40}
+                                    duration={1.2}
+                                />
+                            ) : (
+                                <span className="opacity-0">Installation</span>
+                            )}
                         </span>
-                        <span className="block text-[#90EE90]">
-                            <SplitText
-                                text="Électrique"
-                                className="inline"
-                                tag="span"
-                                textAlign={isMobile ? "center" : "left"}
-                                delay={40}
-                                duration={1.2}
-                            />
+                        <span className="block text-[#90EE90] min-h-[1.1em]">
+                            {startAnimation ? (
+                                <SplitText
+                                    text="Électrique"
+                                    className="inline"
+                                    tag="span"
+                                    textAlign={isMobile ? "center" : "left"}
+                                    delay={40}
+                                    duration={1.2}
+                                />
+                            ) : (
+                                <span className="opacity-0">Électrique</span>
+                            )}
                         </span>
                     </h1>
 
-                    <div className="hidden md:block">
-                        <SplitText
-                            text="Fournir des solutions électriques sûres, fiables et efficaces pour les projets résidentiels, commerciaux et industriels."
-                            className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed mb-10"
-                            tag="p"
-                            textAlign="left"
-                            splitType="words"
-                            delay={40}
-                            duration={1.2}
-                        />
+                    <div className="hidden md:block min-h-[60px]">
+                        {startAnimation ? (
+                            <SplitText
+                                text="Fournir des solutions électriques sûres, fiables et efficaces pour les projets résidentiels, commerciaux et industriels."
+                                className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed mb-10"
+                                tag="p"
+                                textAlign="left"
+                                splitType="words"
+                                delay={40}
+                                duration={1.2}
+                            />
+                        ) : (
+                            <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed mb-10 opacity-0">
+                                Fournir des solutions électriques sûres, fiables et efficaces pour les projets résidentiels, commerciaux et industriels.
+                            </p>
+                        )}
                     </div>
 
-                    <div ref={buttonsRef} className="flex flex-row items-center justify-center md:justify-start gap-3 md:gap-4 mb-10 md:mb-20">
+                    <div ref={buttonsRef} className={`flex flex-row items-center justify-center md:justify-start gap-3 md:gap-4 mb-10 md:mb-20 transition-opacity duration-500 ${startAnimation ? 'opacity-100' : 'opacity-0'}`}>
                         <button className="group flex items-center gap-1.5 md:gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-white hover:bg-[#90EE90] transition-all duration-300 text-black rounded-xl font-semibold text-sm cursor-pointer whitespace-nowrap">
                             Obtenir un devis
                             <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-black group-hover:rotate-12 transition-transform" />
@@ -184,14 +200,17 @@ const Hero = () => {
                 </div>
 
                 {/* Right side - Overlapping Images */}
-                <div ref={containerRef} className="relative w-full lg:w-[500px] h-[220px] sm:h-[300px] md:h-[400px] lg:h-[500px] flex items-center justify-center mt-2 md:mt-12 lg:mt-0 z-10">
+                <div ref={containerRef} className="relative w-full lg:w-[500px] h-[75vw] sm:h-[300px] md:h-[400px] lg:h-[500px] flex items-center justify-center mt-2 md:mt-12 lg:mt-0 z-10">
                     {/* Base shadow/glow for the images stack */}
                     <div className="absolute inset-0 bg-[#90EE90]/5 blur-3xl rounded-full"></div>
 
                     {/* Image 1 (Bottom) */}
                     <div
                         ref={image1Ref}
-                        className="absolute w-44 sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden -rotate-8 -translate-x-12 -translate-y-6 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out animate-hero-image group cursor-pointer z-10"
+                        onClick={() => onSelectService?.('commercial')}
+                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden -rotate-8 -translate-x-12 -translate-y-6 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer z-10 ${
+                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
+                        }`}
                         style={{ '--final-x': '-3rem', '--final-y': '-1.5rem', '--final-rotate': '-8deg' }}
                     >
                         <img
@@ -199,14 +218,20 @@ const Hero = () => {
                             alt="Électricité Commerciale"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 transition-all duration-300">
+                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                             <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Commercial</span>
                             <h3 className="text-xl font-bold text-white mb-2">Électricité Commerciale</h3>
                             <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
                                 Installation électrique haut de gamme, éclairage commercial et configurations de sécurité sur mesure.
                             </p>
                             <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300">
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onSelectService?.('commercial');
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
+                                >
                                     Voir les Détails
                                     <ArrowUpRight className="w-3.5 h-3.5" />
                                 </button>
@@ -217,7 +242,10 @@ const Hero = () => {
                     {/* Image 2 */}
                     <div
                         ref={image2Ref}
-                        className="absolute w-44 sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 translate-x-10 -translate-y-10 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out animate-hero-image group cursor-pointer"
+                        onClick={() => onSelectService?.('residential')}
+                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 translate-x-10 -translate-y-10 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
+                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
+                        }`}
                         style={{ '--final-x': '2.5rem', '--final-y': '-2.5rem', '--final-rotate': '6deg' }}
                     >
                         <img
@@ -225,14 +253,20 @@ const Hero = () => {
                             alt="Câblage Résidentiel"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 transition-all duration-300">
+                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                             <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Résidentiel</span>
                             <h3 className="text-xl font-bold text-white mb-2">Câblage Résidentiel</h3>
                             <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
                                 Intégration d'éclairage élégante, inspections de sécurité électrique et mises à niveau du câblage général.
                             </p>
                             <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300">
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onSelectService?.('residential');
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
+                                >
                                     Voir les Détails
                                     <ArrowUpRight className="w-3.5 h-3.5" />
                                 </button>
@@ -243,7 +277,10 @@ const Hero = () => {
                     {/* Image 3 */}
                     <div
                         ref={image3Ref}
-                        className="absolute w-44 sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 -translate-x-6 translate-y-8 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out animate-hero-image group cursor-pointer"
+                        onClick={() => onSelectService?.('industrial')}
+                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 -translate-x-6 translate-y-8 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
+                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
+                        }`}
                         style={{ '--final-x': '-1.5rem', '--final-y': '2rem', '--final-rotate': '6deg' }}
                     >
                         <img
@@ -251,14 +288,20 @@ const Hero = () => {
                             alt="Solutions Industrielles"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 transition-all duration-300">
+                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                             <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Industriel</span>
                             <h3 className="text-xl font-bold text-white mb-2">Solutions Industrielles</h3>
                             <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
                                 Câblage haute tension, installations de machines, tests et support opérationnel régulier.
                             </p>
                             <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300">
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onSelectService?.('industrial');
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
+                                >
                                     Voir les Détails
                                     <ArrowUpRight className="w-3.5 h-3.5" />
                                 </button>
@@ -269,7 +312,10 @@ const Hero = () => {
                     {/* Image 4 (Top) */}
                     <div
                         ref={image4Ref}
-                        className="absolute w-44 sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-12 translate-x-12 translate-y-12 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out animate-hero-image group cursor-pointer"
+                        onClick={() => onSelectService?.('smart-home')}
+                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-12 translate-x-12 translate-y-12 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
+                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
+                        }`}
                         style={{ '--final-x': '3rem', '--final-y': '3rem', '--final-rotate': '12deg' }}
                     >
                         <img
@@ -277,14 +323,20 @@ const Hero = () => {
                             alt="Domotique Intelligente"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 transition-all duration-300">
+                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                             <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Systèmes Intelligents</span>
                             <h3 className="text-xl font-bold text-white mb-2">Domotique Intelligente</h3>
                             <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
                                 Intégration personnalisée pour la sécurité résidentielle, l'automatisation du climat et le contrôle sans fil à distance.
                             </p>
                             <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300">
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onSelectService?.('smart-home');
+                                    }}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
+                                >
                                     Voir les Détails
                                     <ArrowUpRight className="w-3.5 h-3.5" />
                                 </button>

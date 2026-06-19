@@ -6,13 +6,13 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const Portfolio = () => {
+const Portfolio = ({ onSelectProject }) => {
   const containerRef = useRef(null);
   const projects = [
-    { title: "Installation d'Éclairage Commercial", category: "Commercial", image: "/pic1.jpg" },
-    { title: "Mise à Niveau du Câblage Résidentiel", category: "Résidentiel", image: "/pic2.jpg" },
-    { title: "Installation de Tableaux Industriels", category: "Industriel", image: "/pic3.jpg" },
-    { title: "Intégration Domotique Résidentielle", category: "Systèmes Intelligents", image: "/pic4.png" }
+    { id: "lighting", title: "Installation d'Éclairage Commercial", category: "Commercial", image: "/pic1.jpg" },
+    { id: "wiring", title: "Mise à Niveau du Câblage Résidentiel", category: "Résidentiel", image: "/pic2.jpg" },
+    { id: "switchboard", title: "Installation de Tableaux Industriels", category: "Industriel", image: "/pic3.jpg" },
+    { id: "domotics", title: "Intégration Domotique Résidentielle", category: "Systèmes Intelligents", image: "/pic4.png" }
   ];
 
   useGSAP(() => {
@@ -96,7 +96,8 @@ const Portfolio = () => {
           {projects.map((project, index) => (
             <div 
               key={index} 
-              className="portfolio-card group relative overflow-hidden rounded-2xl bg-[#1A1C23] border border-black/5 aspect-[4/3] shadow-lg hover:shadow-2xl transition-shadow duration-500"
+              onClick={() => onSelectProject?.(project.id)}
+              className="portfolio-card group relative overflow-hidden rounded-2xl bg-[#1A1C23] border border-black/5 aspect-[4/3] shadow-lg hover:shadow-2xl cursor-pointer transition-shadow duration-500"
             >
               <img 
                 src={project.image} 
@@ -105,7 +106,10 @@ const Portfolio = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
                 <span className="text-[#90EE90] text-sm font-medium mb-1">{project.category}</span>
-                <h3 className="text-xl font-semibold text-white">{project.title}</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
+                <span className="text-xs text-gray-400 group-hover:text-[#90EE90] transition-colors flex items-center gap-1 font-semibold uppercase tracking-wider">
+                  Voir le projet <span className="translate-x-0 group-hover:translate-x-1 transition-transform inline-block">→</span>
+                </span>
               </div>
             </div>
           ))}
