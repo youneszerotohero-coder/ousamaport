@@ -3,10 +3,11 @@ import { Sparkles, ArrowUpRight } from 'lucide-react';
 import SplitText from '../components/SplitText';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { servicesData } from '../data/servicesData';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Hero = ({ onSelectService, startAnimation }) => {
+const Hero = ({ onSelectService, startAnimation, onOpenContact, services }) => {
     const image1Ref = useRef(null);
     const image2Ref = useRef(null);
     const image3Ref = useRef(null);
@@ -15,6 +16,10 @@ const Hero = ({ onSelectService, startAnimation }) => {
     const containerRef = useRef(null);
     const buttonsRef = useRef(null);
 
+    const activeServices = services && Object.keys(services).length > 0 
+        ? Object.values(services) 
+        : Object.values(servicesData);
+
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -22,6 +27,16 @@ const Hero = ({ onSelectService, startAnimation }) => {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    const [isEntranceFinished, setIsEntranceFinished] = useState(false);
+    useEffect(() => {
+        if (startAnimation) {
+            const timer = setTimeout(() => {
+                setIsEntranceFinished(true);
+            }, 2500);
+            return () => clearTimeout(timer);
+        }
+    }, [startAnimation]);
 
     useLayoutEffect(() => {
         if (!startAnimation) return;
@@ -43,6 +58,14 @@ const Hero = ({ onSelectService, startAnimation }) => {
                     ease: "power4.out"
                 });
             }
+        });
+        return () => ctx.revert();
+    }, [startAnimation]);
+
+    useLayoutEffect(() => {
+        if (!startAnimation || !isEntranceFinished) return;
+
+        let ctx = gsap.context(() => {
             const animations = [
                 { ref: image1Ref, targetId: 'grid-img-1', startX: -48, startY: -24, startRot: -8 },
                 { ref: image2Ref, targetId: 'grid-img-2', startX: 40, startY: -40, startRot: 6 },
@@ -60,42 +83,39 @@ const Hero = ({ onSelectService, startAnimation }) => {
                 }
             });
 
-            // Delay adding tweens slightly to ensure DOM is fully painted
-            setTimeout(() => {
-                animations.forEach((anim) => {
-                    tl.fromTo(anim.ref.current, {
-                        x: anim.startX,
-                        y: anim.startY,
-                        rotation: anim.startRot,
-                        scale: 1,
-                    }, {
-                        x: () => {
-                            const target = document.getElementById(anim.targetId);
-                            const container = containerRef.current;
-                            if (!target || !container) return 0;
-                            const tRect = target.getBoundingClientRect();
-                            const cRect = container.getBoundingClientRect();
-                            return (tRect.left + tRect.width / 2) - (cRect.left + cRect.width / 2);
-                        },
-                        y: () => {
-                            const target = document.getElementById(anim.targetId);
-                            const container = containerRef.current;
-                            if (!target || !container) return 0;
-                            const tRect = target.getBoundingClientRect();
-                            const cRect = container.getBoundingClientRect();
-                            return (tRect.top + tRect.height / 2) - (cRect.top + cRect.height / 2);
-                        },
-                        scale: () => {
-                            const target = document.getElementById(anim.targetId);
-                            if (!target || !anim.ref.current) return 1;
-                            return target.getBoundingClientRect().width / anim.ref.current.offsetWidth;
-                        },
-                        rotation: 0,
-                        ease: "none",
-                        immediateRender: false
-                    }, 0);
-                });
-            }, 100);
+            animations.forEach((anim) => {
+                tl.fromTo(anim.ref.current, {
+                    x: anim.startX,
+                    y: anim.startY,
+                    rotation: anim.startRot,
+                    scale: 1,
+                }, {
+                    x: () => {
+                        const target = document.getElementById(anim.targetId);
+                        const container = containerRef.current;
+                        if (!target || !container) return 0;
+                        const tRect = target.getBoundingClientRect();
+                        const cRect = container.getBoundingClientRect();
+                        return (tRect.left + tRect.width / 2) - (cRect.left + cRect.width / 2);
+                    },
+                    y: () => {
+                        const target = document.getElementById(anim.targetId);
+                        const container = containerRef.current;
+                        if (!target || !container) return 0;
+                        const tRect = target.getBoundingClientRect();
+                        const cRect = container.getBoundingClientRect();
+                        return (tRect.top + tRect.height / 2) - (cRect.top + cRect.height / 2);
+                    },
+                    scale: () => {
+                        const target = document.getElementById(anim.targetId);
+                        if (!target || !anim.ref.current) return 1;
+                        return target.getBoundingClientRect().width / anim.ref.current.offsetWidth;
+                    },
+                    rotation: 0,
+                    ease: "none",
+                    immediateRender: false
+                }, 0);
+            });
 
             // Pin the services section at the top of viewport when it reaches top,
             // and unpin it when about section reaches top. Use pinSpacing: false so about overlays it.
@@ -126,7 +146,7 @@ const Hero = ({ onSelectService, startAnimation }) => {
         });
 
         return () => ctx.revert();
-    }, [startAnimation]);
+    }, [startAnimation, isEntranceFinished]);
 
     return (
         <div className="relative min-h-screen flex flex-col font-sans bg-[#0A0B10] pt-20 z-20">
@@ -148,6 +168,7 @@ const Hero = ({ onSelectService, startAnimation }) => {
                                     textAlign={isMobile ? "center" : "left"}
                                     delay={40}
                                     duration={1.2}
+                                
                                 />
                             ) : (
                                 <span className="opacity-0">Installation</span>
@@ -162,6 +183,7 @@ const Hero = ({ onSelectService, startAnimation }) => {
                                     textAlign={isMobile ? "center" : "left"}
                                     delay={40}
                                     duration={1.2}
+                                
                                 />
                             ) : (
                                 <span className="opacity-0">Électrique</span>
@@ -179,6 +201,7 @@ const Hero = ({ onSelectService, startAnimation }) => {
                                 splitType="words"
                                 delay={40}
                                 duration={1.2}
+                            
                             />
                         ) : (
                             <p className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed mb-10 opacity-0">
@@ -188,12 +211,23 @@ const Hero = ({ onSelectService, startAnimation }) => {
                     </div>
 
                     <div ref={buttonsRef} className={`flex flex-row items-center justify-center md:justify-start gap-3 md:gap-4 mb-10 md:mb-20 transition-opacity duration-500 ${startAnimation ? 'opacity-100' : 'opacity-0'}`}>
-                        <button className="group flex items-center gap-1.5 md:gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-white hover:bg-[#90EE90] transition-all duration-300 text-black rounded-xl font-semibold text-sm cursor-pointer whitespace-nowrap">
+                        <button 
+                            onClick={onOpenContact}
+                            className="group flex items-center gap-1.5 md:gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-white hover:bg-[#90EE90] transition-all duration-300 text-black rounded-xl font-semibold text-sm cursor-pointer whitespace-nowrap"
+                        >
                             Obtenir un devis
                             <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-black group-hover:rotate-12 transition-transform" />
                         </button>
-                        <button className="group flex items-center gap-1.5 md:gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-white/5 hover:bg-white transition-all duration-300 text-white hover:text-black rounded-xl font-semibold border border-white/10 text-sm cursor-pointer whitespace-nowrap">
-                            Nos Services
+                        <button 
+                            onClick={() => {
+                                const el = document.getElementById('portfolio');
+                                if (el) {
+                                    el.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }}
+                            className="group flex items-center gap-1.5 md:gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-white/5 hover:bg-white transition-all duration-300 text-white hover:text-black rounded-xl font-semibold border border-white/10 text-sm cursor-pointer whitespace-nowrap"
+                        >
+                            Nos Projets
                             <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 group-hover:text-black transition-colors group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                         </button>
                     </div>
@@ -204,145 +238,68 @@ const Hero = ({ onSelectService, startAnimation }) => {
                     {/* Base shadow/glow for the images stack */}
                     <div className="absolute inset-0 bg-[#90EE90]/5 blur-3xl rounded-full"></div>
 
-                    {/* Image 1 (Bottom) */}
-                    <div
-                        ref={image1Ref}
-                        onClick={() => onSelectService?.('commercial')}
-                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden -rotate-8 -translate-x-12 -translate-y-6 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer z-10 ${
-                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
-                        }`}
-                        style={{ '--final-x': '-3rem', '--final-y': '-1.5rem', '--final-rotate': '-8deg' }}
-                    >
-                        <img
-                            src="/pic1.jpg"
-                            alt="Électricité Commerciale"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Commercial</span>
-                            <h3 className="text-xl font-bold text-white mb-2">Électricité Commerciale</h3>
-                            <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
-                                Installation électrique haut de gamme, éclairage commercial et configurations de sécurité sur mesure.
-                            </p>
-                            <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onSelectService?.('commercial');
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
-                                >
-                                    Voir les Détails
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    {activeServices.slice(0, 4).map((service, index) => {
+                        const cardStyles = [
+                            {
+                                style: { '--final-x': '-3rem', '--final-y': '-1.5rem', '--final-rotate': '-8deg' },
+                                className: '-rotate-8 -translate-x-12 -translate-y-6 z-10'
+                            },
+                            {
+                                style: { '--final-x': '2.5rem', '--final-y': '-2.5rem', '--final-rotate': '6deg' },
+                                className: 'rotate-6 translate-x-10 -translate-y-10'
+                            },
+                            {
+                                style: { '--final-x': '-1.5rem', '--final-y': '2rem', '--final-rotate': '6deg' },
+                                className: 'rotate-6 -translate-x-6 translate-y-8'
+                            },
+                            {
+                                style: { '--final-x': '3rem', '--final-y': '3rem', '--final-rotate': '12deg' },
+                                className: 'rotate-12 translate-x-12 translate-y-12'
+                            }
+                        ];
+                        
+                        const styleConfig = cardStyles[index] || cardStyles[0];
+                        const ref = index === 0 ? image1Ref : index === 1 ? image2Ref : index === 2 ? image3Ref : image4Ref;
 
-                    {/* Image 2 */}
-                    <div
-                        ref={image2Ref}
-                        onClick={() => onSelectService?.('residential')}
-                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 translate-x-10 -translate-y-10 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
-                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
-                        }`}
-                        style={{ '--final-x': '2.5rem', '--final-y': '-2.5rem', '--final-rotate': '6deg' }}
-                    >
-                        <img
-                            src="/pic2.jpg"
-                            alt="Câblage Résidentiel"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Résidentiel</span>
-                            <h3 className="text-xl font-bold text-white mb-2">Câblage Résidentiel</h3>
-                            <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
-                                Intégration d'éclairage élégante, inspections de sécurité électrique et mises à niveau du câblage général.
-                            </p>
-                            <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onSelectService?.('residential');
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
-                                >
-                                    Voir les Détails
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
-                                </button>
+                        return (
+                            <div
+                                key={service.id || index}
+                                ref={ref}
+                                onClick={() => onSelectService?.(service.id)}
+                                className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${styleConfig.className} ${
+                                    isEntranceFinished 
+                                        ? '' 
+                                        : (startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none')
+                                }`}
+                                style={styleConfig.style}
+                            >
+                                <img
+                                    src={service.image}
+                                    alt={service.title}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                    <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">{service.category}</span>
+                                    <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
+                                    <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
+                                        {service.tagline}
+                                    </p>
+                                    <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onSelectService?.(service.id);
+                                            }}
+                                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
+                                        >
+                                            Voir les Détails
+                                            <ArrowUpRight className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Image 3 */}
-                    <div
-                        ref={image3Ref}
-                        onClick={() => onSelectService?.('industrial')}
-                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-6 -translate-x-6 translate-y-8 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
-                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
-                        }`}
-                        style={{ '--final-x': '-1.5rem', '--final-y': '2rem', '--final-rotate': '6deg' }}
-                    >
-                        <img
-                            src="/pic3.jpg"
-                            alt="Solutions Industrielles"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Industriel</span>
-                            <h3 className="text-xl font-bold text-white mb-2">Solutions Industrielles</h3>
-                            <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
-                                Câblage haute tension, installations de machines, tests et support opérationnel régulier.
-                            </p>
-                            <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onSelectService?.('industrial');
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
-                                >
-                                    Voir les Détails
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Image 4 (Top) */}
-                    <div
-                        ref={image4Ref}
-                        onClick={() => onSelectService?.('smart-home')}
-                        className={`absolute w-[58vw] sm:w-64 md:w-92 aspect-[3/2] rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden rotate-12 translate-x-12 translate-y-12 hover:rotate-0 hover:z-50 hover:scale-105 hover:shadow-[#90EE90]/20 transition-all duration-500 ease-out group cursor-pointer ${
-                            startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none'
-                        }`}
-                        style={{ '--final-x': '3rem', '--final-y': '3rem', '--final-rotate': '12deg' }}
-                    >
-                        <img
-                            src="/pic4.png"
-                            alt="Domotique Intelligente"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">Systèmes Intelligents</span>
-                            <h3 className="text-xl font-bold text-white mb-2">Domotique Intelligente</h3>
-                            <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
-                                Intégration personnalisée pour la sécurité résidentielle, l'automatisation du climat et le contrôle sans fil à distance.
-                            </p>
-                            <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onSelectService?.('smart-home');
-                                    }}
-                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#90EE90] text-black font-semibold text-xs rounded-lg hover:bg-white transition-colors duration-300 cursor-pointer"
-                                >
-                                    Voir les Détails
-                                    <ArrowUpRight className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                        );
+                    })}
                 </div>
             </main>
         </div>

@@ -6,7 +6,7 @@ const LoadingScreen = ({ onStartExit, onFinished }) => {
   const [isDone, setIsDone] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
 
-  const duration = 5000; // 5 seconds loading
+  const duration = 3000; // 3 seconds loading
 
   useEffect(() => {
     // Block scroll when loading starts
@@ -92,19 +92,18 @@ const LoadingScreen = ({ onStartExit, onFinished }) => {
           ></div>
           
           {/* Middle pulsing glow ring with gradient */}
-          <div className="absolute inset-2 rounded-full bg-gradient-to-br from-[#90EE90] to-green-800 flex items-center justify-center shadow-[0_0_30px_rgba(144,238,144,0.25)] animate-pulse">
-            {/* Inner dark center */}
-            <div className="w-12 h-12 rounded-full bg-[#0A0B10] flex items-center justify-center">
-              {/* Inner glowing green core */}
-              <div className="w-4 h-4 rounded-full bg-[#90EE90] shadow-[0_0_12px_#90EE90] animate-ping duration-1000"></div>
-              <div className="absolute w-3 h-3 rounded-full bg-[#90EE90] shadow-[0_0_8px_#90EE90]"></div>
-            </div>
+          <div className="absolute inset-2 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(144,238,144,0.25)] bg-[#0A0B10] overflow-hidden">
+            <img 
+              src="/ousamalogo.png" 
+              alt="Logo" 
+              className="w-14 h-14 object-contain animate-pulse" 
+            />
           </div>
         </div>
 
         {/* Brand Text */}
         <div className="text-3xl font-extrabold tracking-[0.25em] text-white uppercase mb-1 font-sans">
-          Elec<span className="text-[#90EE90]" style={{ textShadow: '0 0 15px rgba(144,238,144,0.6)' }}>pro</span>
+          Elec<span className="text-[#90EE90]" style={{ textShadow: '0 0 15px rgba(144,238,144,0.6)' }}>pro-dz</span>
         </div>
 
         {/* Status indicator */}
@@ -138,7 +137,7 @@ const LoadingScreen = ({ onStartExit, onFinished }) => {
 
       {/* Decorative footer elements */}
       <div className="absolute bottom-10 flex flex-col items-center gap-1 opacity-20 font-mono text-[9px] tracking-widest text-gray-400">
-        <span>ELECPRO V2.0 // EST. 2026</span>
+        <span>Elecpro-dz V2.0 // EST. 2026</span>
         <span>ENERGY OPTIMIZED INTERFACE</span>
       </div>
     </div>

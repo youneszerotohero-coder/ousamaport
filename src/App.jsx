@@ -8,23 +8,61 @@ import TestimonialsSection from "./components/TestimonialsSection"
 import Footer from "./components/Footer"
 import ServiceDetails from "./pages/ServiceDetails"
 import ProjectDetails from "./pages/ProjectDetails"
+import ProjectsPage from "./pages/ProjectsPage"
 import LoadingScreen from "./components/LoadingScreen"
 import ContactPopup from "./components/ContactPopup"
+import AdminDashboard from "./pages/AdminDashboard"
+import { fetchServices, fetchProjects, fetchContact } from "./lib/api"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger);
 
 const App = () => {
   const [isLoadingScreen, setIsLoadingScreen] = useState(true);
   const [startHeroAnimation, setStartHeroAnimation] = useState(false);
   const [currentServiceId, setCurrentServiceId] = useState(null);
   const [currentProjectId, setCurrentProjectId] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isProjectsPage, setIsProjectsPage] = useState(false);
   const [transitionState, setTransitionState] = useState('idle'); // 'idle' | 'entering' | 'exiting'
+
+  // DB dynamic data state
+  const [services, setServices] = useState(null);
+  const [projects, setProjects] = useState(null);
+  const [contact, setContact] = useState(null);
+  const [isContactOpen, setIsContactOpen] = useState(false);
 
   const currentServiceIdRef = useRef(null);
   const currentProjectIdRef = useRef(null);
+  const isAdminRef = useRef(false);
+  const isProjectsPageRef = useRef(false);
 
   useEffect(() => {
     currentServiceIdRef.current = currentServiceId;
     currentProjectIdRef.current = currentProjectId;
+    isAdminRef.current = isAdmin;
+    isProjectsPageRef.current = isProjectsPage;
   });
+
+  // Load database data on mount
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        const [sData, pData, cData] = await Promise.all([
+          fetchServices(),
+          fetchProjects(),
+          fetchContact()
+        ]);
+        setServices(sData);
+        setProjects(pData);
+        setContact(cData);
+      } catch (err) {
+        console.error('Failed to load portfolio database data:', err);
+      }
+    };
+    loadAllData();
+  }, []);
 
   const triggerPageTransition = (navCallback) => {
     setTransitionState('entering');
@@ -33,9 +71,22 @@ const App = () => {
       setTransitionState('exiting');
       setTimeout(() => {
         setTransitionState('idle');
+        // Let layout settle, then refresh ScrollTrigger positions
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 100);
       }, 650);
     }, 650);
   };
+
+  useEffect(() => {
+    if (!isLoadingScreen) {
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingScreen]);
 
   useEffect(() => {
     // Check initial path on load
@@ -44,33 +95,58 @@ const App = () => {
       const serviceMatch = path.match(/\/service\/([^/]+)/);
       const projectMatch = path.match(/\/project\/([^/]+)/);
       
-      if (serviceMatch) {
+      if (path === '/admin') {
+        setIsAdmin(true);
+        setIsProjectsPage(false);
+        setCurrentServiceId(null);
+        setCurrentProjectId(null);
+      } else if (path === '/projects') {
+        setIsProjectsPage(true);
+        setIsAdmin(false);
+        setCurrentServiceId(null);
+        setCurrentProjectId(null);
+      } else if (serviceMatch) {
         setCurrentServiceId(serviceMatch[1]);
         setCurrentProjectId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
       } else if (projectMatch) {
         setCurrentProjectId(projectMatch[1]);
         setCurrentServiceId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
       } else {
         setCurrentServiceId(null);
         setCurrentProjectId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
       }
     };
 
     // Transitioning check for back/forward navigation
     const checkPathPopState = () => {
       const path = window.location.pathname;
+      const isAdminPath = path === '/admin';
+      const isProjectsPath = path === '/projects';
       const serviceMatch = path.match(/\/service\/([^/]+)/);
       const projectMatch = path.match(/\/project\/([^/]+)/);
       
       const nextServiceId = serviceMatch ? serviceMatch[1] : null;
       const nextProjectId = projectMatch ? projectMatch[1] : null;
 
-      // Skip transition if target is same as current page (e.g. hash navigations on home page)
-      if (nextServiceId === currentServiceIdRef.current && nextProjectId === currentProjectIdRef.current) {
+      // Skip transition if target is same as current page
+      if (
+        isAdminPath === isAdminRef.current && 
+        isProjectsPath === isProjectsPageRef.current && 
+        nextServiceId === currentServiceIdRef.current && 
+        nextProjectId === currentProjectIdRef.current
+      ) {
         return;
       }
 
       triggerPageTransition(() => {
+        setIsAdmin(isAdminPath);
+        setIsProjectsPage(isProjectsPath);
         if (serviceMatch) {
           setCurrentServiceId(serviceMatch[1]);
           setCurrentProjectId(null);
@@ -98,11 +174,15 @@ const App = () => {
         window.history.pushState({ serviceId: id }, "", `/service/${id}`);
         setCurrentServiceId(id);
         setCurrentProjectId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
         window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
         window.history.pushState(null, "", "/");
         setCurrentServiceId(null);
         setCurrentProjectId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
     });
@@ -114,13 +194,61 @@ const App = () => {
         window.history.pushState({ projectId: id }, "", `/project/${id}`);
         setCurrentProjectId(id);
         setCurrentServiceId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
         window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
         window.history.pushState(null, "", "/");
         setCurrentProjectId(null);
         setCurrentServiceId(null);
+        setIsAdmin(false);
+        setIsProjectsPage(false);
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
+    });
+  };
+
+  const navigateToProjectsPage = () => {
+    triggerPageTransition(() => {
+      window.history.pushState(null, "", "/projects");
+      setIsProjectsPage(true);
+      setCurrentServiceId(null);
+      setCurrentProjectId(null);
+      setIsAdmin(false);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  };
+
+  const navigateFromProjectsPage = () => {
+    triggerPageTransition(() => {
+      window.history.pushState(null, "", "/");
+      setIsProjectsPage(false);
+      setCurrentServiceId(null);
+      setCurrentProjectId(null);
+      setIsAdmin(false);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  };
+
+  const navigateToAdmin = () => {
+    triggerPageTransition(() => {
+      window.history.pushState(null, "", "/admin");
+      setIsAdmin(true);
+      setIsProjectsPage(false);
+      setCurrentServiceId(null);
+      setCurrentProjectId(null);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  };
+
+  const navigateFromAdmin = () => {
+    triggerPageTransition(() => {
+      window.history.pushState(null, "", "/");
+      setIsAdmin(false);
+      setIsProjectsPage(false);
+      setCurrentServiceId(null);
+      setCurrentProjectId(null);
+      window.scrollTo({ top: 0, behavior: 'instant' });
     });
   };
 
@@ -129,6 +257,8 @@ const App = () => {
       window.history.pushState(null, "", "/");
       setCurrentServiceId(null);
       setCurrentProjectId(null);
+      setIsAdmin(false);
+      setIsProjectsPage(false);
       
       // Wait for the render to complete, then scroll to section
       setTimeout(() => {
@@ -176,46 +306,78 @@ const App = () => {
               }`}
               style={{ transitionDelay: transitionState === 'entering' ? '250ms' : '0ms' }}
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#90EE90] to-green-800 flex items-center justify-center shadow-[0_0_20px_rgba(144,238,144,0.3)]">
-                <div className="w-5 h-5 rounded-full bg-[#0A0B10]"></div>
-              </div>
+              <img 
+                src="/ousamalogo.png" 
+                alt="Logo" 
+                className="w-10 h-10 object-contain shadow-[0_0_20px_rgba(144,238,144,0.3)]" 
+              />
               <span className="font-extrabold text-xl tracking-widest text-white font-sans uppercase">
-                Elec<span className="text-[#90EE90]" style={{ textShadow: '0 0 10px rgba(144,238,144,0.4)' }}>pro</span>
+                Elec<span className="text-[#90EE90]" style={{ textShadow: '0 0 10px rgba(144,238,144,0.4)' }}>pro-dz</span>
               </span>
             </div>
           </div>
         </div>
       )}
 
-      <Header 
-        currentServiceId={currentServiceId || currentProjectId} 
-        onNavigateHome={handleNavigateHomeAndScroll} 
-        startAnimation={startHeroAnimation || !isLoadingScreen}
-      />
-      
-      {currentServiceId && (
-        <ServiceDetails serviceId={currentServiceId} onBack={() => navigateToService(null)} />
-      )}
-      
-      {currentProjectId && (
-        <ProjectDetails 
-          projectId={currentProjectId} 
-          onBack={() => navigateToProject(null)} 
-          onSelectProject={navigateToProject} 
-        />
-      )}
-      
-      {!currentServiceId && !currentProjectId && (
+      {isAdmin ? (
+        <AdminDashboard onBack={navigateFromAdmin} />
+      ) : (
         <>
-          <Hero onSelectService={navigateToService} startAnimation={startHeroAnimation || !isLoadingScreen} />
-          <Services />
-          <About />
-          <Portfolio onSelectProject={navigateToProject} />
-          <TestimonialsSection />
-          <Footer />
+          <Header 
+            currentServiceId={currentServiceId || currentProjectId || isProjectsPage} 
+            onNavigateHome={handleNavigateHomeAndScroll} 
+            startAnimation={startHeroAnimation || !isLoadingScreen}
+            contact={contact}
+          />
+          
+          {currentServiceId && (
+            <ServiceDetails 
+              serviceId={currentServiceId} 
+              onBack={() => navigateToService(null)} 
+              services={services} 
+              onOpenContact={() => setIsContactOpen(true)}
+            />
+          )}
+          
+          {currentProjectId && (
+            <ProjectDetails 
+              projectId={currentProjectId} 
+              onBack={() => navigateToProject(null)} 
+              onSelectProject={navigateToProject} 
+              projects={projects}
+            />
+          )}
+
+          {isProjectsPage && (
+            <ProjectsPage 
+              projects={projects}
+              onSelectProject={navigateToProject}
+              onBack={navigateFromProjectsPage}
+            />
+          )}
+          
+          {!currentServiceId && !currentProjectId && !isProjectsPage && (
+            <>
+              <Hero 
+                services={services}
+                onSelectService={navigateToService} 
+                startAnimation={startHeroAnimation || !isLoadingScreen} 
+                onOpenContact={() => setIsContactOpen(true)}
+              />
+              <Services />
+              <About />
+              <Portfolio 
+                onSelectProject={navigateToProject} 
+                projects={projects} 
+                onSeeMore={navigateToProjectsPage}
+              />
+              <TestimonialsSection />
+              <Footer contact={contact} onNavigateAdmin={navigateToAdmin} />
+            </>
+          )}
+          <ContactPopup contact={contact} isOpen={isContactOpen} setIsOpen={setIsContactOpen} />
         </>
       )}
-      <ContactPopup />
     </div>
   )
 }

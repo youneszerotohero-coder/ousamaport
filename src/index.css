@@ -157,8 +157,8 @@ body {
 }
 
 .animate-hero-image {
-  animation: hero-image-reveal 3s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: 500ms;
+  animation: hero-image-reveal 2s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: 300ms;
 }
 
 @keyframes sweep-enter {

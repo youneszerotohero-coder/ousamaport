@@ -4,8 +4,8 @@ import { servicesData } from '../data/servicesData';
 import Footer from '../components/Footer';
 import ImageSlider from '../components/ImageSlider';
 
-const ServiceDetails = ({ serviceId, onBack }) => {
-  const data = servicesData[serviceId];
+const ServiceDetails = ({ serviceId, onBack, services = servicesData, onOpenContact }) => {
+  const data = services[serviceId];
 
   // Scroll to top when service changes
   useEffect(() => {
@@ -30,7 +30,9 @@ const ServiceDetails = ({ serviceId, onBack }) => {
   // Extract images for the slideshow
   const sliderImages = [
     data.image,
-    ...(data.projects ? data.projects.map((p) => p.image) : [])
+    ...(data.gallery && data.gallery.length > 0 
+      ? data.gallery 
+      : (data.projects ? data.projects.map((p) => p.image) : []))
   ].filter(Boolean);
 
   return (
@@ -116,13 +118,17 @@ const ServiceDetails = ({ serviceId, onBack }) => {
           </button>
           <button 
             onClick={() => {
-              onBack();
-              setTimeout(() => {
-                const element = document.querySelector('#contact');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }, 300);
+              if (onOpenContact) {
+                onOpenContact();
+              } else {
+                onBack();
+                setTimeout(() => {
+                  const element = document.querySelector('#contact');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 300);
+              }
             }}
             className="flex items-center gap-2 px-6 py-3.5 bg-[#90EE90] hover:bg-white text-black font-bold rounded-xl transition-all duration-300 text-sm cursor-pointer shadow-lg shadow-[#90EE90]/10"
           >

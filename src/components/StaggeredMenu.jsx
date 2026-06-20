@@ -1,6 +1,36 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
+const FacebookIcon = ({ className }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const InstagramIcon = ({ className }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
 export const StaggeredMenu = ({
   position = 'right',
   colors = ['#B497CF', '#5227FF'],
@@ -389,10 +419,12 @@ export const StaggeredMenu = ({
           <div
             className="sm-logo flex items-center gap-2 select-none pointer-events-auto"
             aria-label="Logo">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#90EE90] to-green-800 flex items-center justify-center">
-              <div className="w-4 h-4 rounded-full bg-[#0A0B10]"></div>
-            </div>
-            <span className="font-semibold text-lg tracking-wide text-white">Elecpro</span>
+            <img 
+              src="/ousamalogo.png" 
+              alt="Logo" 
+              className="w-8 h-8 object-contain" 
+            />
+            <span className="font-semibold text-lg tracking-wide text-white">Elecpro-dz</span>
           </div>
 
           <button
@@ -490,17 +522,26 @@ export const StaggeredMenu = ({
                 <ul
                   className="sm-socials-list list-none m-0 p-0 flex flex-row items-center gap-4 flex-wrap"
                   role="list">
-                  {socialItems.map((s, i) => (
-                    <li key={s.label + i} className="sm-socials-item">
-                      <a
-                        href={s.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="sm-socials-link text-[1.2rem] font-medium text-[#111] no-underline relative inline-block py-[2px] transition-[color,opacity] duration-300 ease-linear">
-                        {s.label}
-                      </a>
-                    </li>
-                  ))}
+                  {socialItems.map((s, i) => {
+                    const labelLower = s.label.toLowerCase();
+                    let IconComponent = null;
+                    if (labelLower === 'facebook') IconComponent = FacebookIcon;
+                    else if (labelLower === 'instagram') IconComponent = InstagramIcon;
+
+                    return (
+                      <li key={s.label + i} className="sm-socials-item">
+                        <a
+                          href={s.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="sm-socials-link text-[1.2rem] font-medium no-underline relative inline-flex items-center justify-center p-2 rounded-full bg-white/5 border border-white/10 hover:border-[#90EE90]/30 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                          title={s.label}
+                        >
+                          {IconComponent ? <IconComponent className="w-5 h-5" /> : s.label}
+                        </a>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}

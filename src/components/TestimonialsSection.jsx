@@ -43,7 +43,7 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4"
         >
-          Témoignages
+          l’équipe
         </motion.h2>
         
         <motion.p 
@@ -53,7 +53,7 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-gray-400 text-base sm:text-lg max-w-lg mx-auto mb-10"
         >
-          Découvrez ce que disent nos clients sur nos services et leur expérience avec notre équipe d'experts.
+          Voici notre équipe d'experts dévoués à vous offrir les meilleures solutions.
         </motion.p>
       </div>
 

@@ -2,12 +2,34 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, ArrowUpRight } from 'lucide-react';
 
-const ContactPopup = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const ContactPopup = ({ contact, isOpen: controlledIsOpen, setIsOpen: controlledSetIsOpen }) => {
+  const [localIsOpen, setLocalIsOpen] = useState(false);
+
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : localIsOpen;
+  const setIsOpen = controlledSetIsOpen !== undefined ? controlledSetIsOpen : setLocalIsOpen;
 
   const togglePopup = () => {
     setIsOpen(!isOpen);
   };
+
+  // Helper variables for dynamic links based on contact details
+  const whatsappNumber = contact?.whatsapp || '+15551234567';
+  const whatsappUrl = whatsappNumber.startsWith('http') 
+    ? whatsappNumber 
+    : `https://wa.me/${whatsappNumber.replace(/[\s\+\-\(\)]/g, '')}`;
+
+  const viberNumber = contact?.viber || '+15551234567';
+  const viberUrl = viberNumber.startsWith('viber://') 
+    ? viberNumber 
+    : `viber://chat?number=%2B${viberNumber.replace(/[\s\+\-\(\)]/g, '')}`;
+
+  const telegramUsername = contact?.telegram || 'elecpro_admin';
+  const telegramUrl = telegramUsername.startsWith('http') 
+    ? telegramUsername 
+    : `https://t.me/${telegramUsername.replace(/@/g, '')}`;
+  const telegramLabel = telegramUsername.startsWith('@') 
+    ? telegramUsername 
+    : `@${telegramUsername}`;
 
   // Custom Viber SVG Icon
   const ViberIcon = () => (
@@ -43,161 +65,174 @@ const ContactPopup = () => {
   );
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      
-      {/* Contact Popup */}
+    <>
+      {/* Contact Popup Modal & Overlay */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.95, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: 25, scale: 0.95, filter: 'blur(8px)' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            className="mb-4 w-96 max-w-[calc(100vw-3rem)] bg-[#1A1C23]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden"
-          >
-            {/* Ambient Background Glow */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#90EE90]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Blurred Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={togglePopup}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            />
             
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#90EE90] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#90EE90]"></span>
-                </span>
-                <span className="text-xs font-semibold text-[#90EE90] tracking-wider uppercase">Disponible</span>
-              </div>
-              <button 
-                onClick={togglePopup}
-                className="text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition-all duration-300 hover:rotate-90 cursor-pointer"
-                aria-label="Fermer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Title & Description */}
-            <div className="mb-6 relative z-10">
-              <h3 className="text-xl font-bold text-white mb-1">Discutons Ensemble !</h3>
-              <p className="text-sm text-gray-400">
-                Vous avez un projet ou une question ? Contactez-nous directement sur nos réseaux.
-              </p>
-            </div>
-
-            {/* Channels */}
-            <div className="space-y-3 relative z-10">
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: 25, scale: 0.95, filter: 'blur(8px)' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="w-96 max-w-full bg-[#1A1C23]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden z-10 text-white"
+            >
+              {/* Ambient Background Glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#90EE90]/10 rounded-full blur-3xl pointer-events-none" />
               
-              {/* WhatsApp Channel */}
-              <a 
-                href="https://wa.me/15551234567" // Placeholder WhatsApp Link - can be updated easily
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between p-4 bg-[#25D366]/5 hover:bg-[#25D366]/15 border border-[#25D366]/20 hover:border-[#25D366]/40 rounded-xl transition-all duration-300 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#25D366]/25 flex items-center justify-center text-[#25D366] shadow-[0_0_15px_rgba(37,211,102,0.15)] group-hover:scale-105 transition-transform duration-300">
-                    <WhatsAppIcon />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">WhatsApp</h4>
-                    <p className="text-xs text-gray-400">Discuter en direct</p>
-                  </div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4 relative z-10">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#90EE90] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-[#90EE90]"></span>
+                  </span>
+                  <span className="text-xs font-semibold text-[#90EE90] tracking-wider uppercase">Disponible</span>
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-              </a>
+                <button 
+                  onClick={togglePopup}
+                  className="text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-1.5 rounded-full transition-all duration-300 hover:rotate-90 cursor-pointer"
+                  aria-label="Fermer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
 
-              {/* Viber Channel */}
-              <a 
-                href="viber://chat?number=%2B15551234567" // Placeholder number - can be updated easily
-                className="group flex items-center justify-between p-4 bg-[#7360F2]/5 hover:bg-[#7360F2]/15 border border-[#7360F2]/20 hover:border-[#7360F2]/40 rounded-xl transition-all duration-300 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#7360F2]/25 flex items-center justify-center text-[#7360F2] shadow-[0_0_15px_rgba(115,96,242,0.15)] group-hover:scale-105 transition-transform duration-300">
-                    <ViberIcon />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Viber</h4>
-                    <p className="text-xs text-gray-400">Discuter instantanément</p>
-                  </div>
-                </div>
-                <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-              </a>
+              {/* Title & Description */}
+              <div className="mb-6 relative z-10">
+                <h3 className="text-xl font-bold text-white mb-1">Discutons Ensemble !</h3>
+                <p className="text-sm text-gray-400">
+                  Vous avez un projet ou une question ? Contactez-nous directement sur nos réseaux.
+                </p>
+              </div>
 
-              {/* Telegram Channel */}
-              <a 
-                href="https://t.me/elecpro_admin" // Placeholder Telegram Username
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between p-4 bg-[#24A1DE]/5 hover:bg-[#24A1DE]/15 border border-[#24A1DE]/20 hover:border-[#24A1DE]/40 rounded-xl transition-all duration-300 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#24A1DE]/25 flex items-center justify-center text-[#24A1DE] shadow-[0_0_15px_rgba(36,161,222,0.15)] group-hover:scale-105 transition-transform duration-300">
-                    <TelegramIcon />
+              {/* Channels */}
+              <div className="space-y-3 relative z-10">
+                
+                {/* WhatsApp Channel */}
+                <a 
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between p-4 bg-[#25D366]/5 hover:bg-[#25D366]/15 border border-[#25D366]/20 hover:border-[#25D366]/40 rounded-xl transition-all duration-300 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#25D366]/25 flex items-center justify-center text-[#25D366] shadow-[0_0_15px_rgba(37,211,102,0.15)] group-hover:scale-105 transition-transform duration-300">
+                      <WhatsAppIcon />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">WhatsApp</h4>
+                      <p className="text-xs text-gray-400">Discuter en direct</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Telegram</h4>
-                    <p className="text-xs text-gray-400 font-sans">@elecpro_admin</p>
+                  <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                </a>
+
+                {/* Viber Channel */}
+                <a 
+                  href={viberUrl}
+                  className="group flex items-center justify-between p-4 bg-[#7360F2]/5 hover:bg-[#7360F2]/15 border border-[#7360F2]/20 hover:border-[#7360F2]/40 rounded-xl transition-all duration-300 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#7360F2]/25 flex items-center justify-center text-[#7360F2] shadow-[0_0_15px_rgba(115,96,242,0.15)] group-hover:scale-105 transition-transform duration-300">
+                      <ViberIcon />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Viber</h4>
+                      <p className="text-xs text-gray-400">Discuter instantanément</p>
+                    </div>
                   </div>
-                </div>
-                <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-              </a>
+                  <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                </a>
 
-            </div>
+                {/* Telegram Channel */}
+                <a 
+                  href={telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-between p-4 bg-[#24A1DE]/5 hover:bg-[#24A1DE]/15 border border-[#24A1DE]/20 hover:border-[#24A1DE]/40 rounded-xl transition-all duration-300 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#24A1DE]/25 flex items-center justify-center text-[#24A1DE] shadow-[0_0_15px_rgba(36,161,222,0.15)] group-hover:scale-105 transition-transform duration-300">
+                      <TelegramIcon />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Telegram</h4>
+                      <p className="text-xs text-gray-400 font-sans">{telegramLabel}</p>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                </a>
 
-            {/* Subtle Footer Note */}
-            <div className="mt-5 text-center text-[10px] text-gray-500 relative z-10">
-              Elecpro Réponse Express
-            </div>
-          </motion.div>
+              </div>
+
+              {/* Subtle Footer Note */}
+              <div className="mt-5 text-center text-[10px] text-gray-500 relative z-10">
+                Elecpro-dz Réponse Express
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
       {/* Floating Action Button */}
-      <motion.button
-        onClick={togglePopup}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
-        className={`relative w-14 h-14 rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-all duration-300 z-50 border group select-none ${
-          isOpen 
-            ? 'bg-[#1A1C23] border-white/20 text-[#90EE90] shadow-[0_0_20px_rgba(144,238,144,0.15)]' 
-            : 'bg-[#90EE90] border-transparent text-black shadow-[0_4px_20px_rgba(144,238,144,0.3)] hover:shadow-[0_0_30px_rgba(144,238,144,0.5)] hover:bg-[#a3ffa3]'
-        }`}
-        aria-label="Bouton de contact"
-      >
-        {/* Pulsing ring when closed */}
-        {!isOpen && (
-          <span className="absolute -inset-0.5 rounded-full bg-[#90EE90]/40 animate-ping opacity-60 pointer-events-none" />
-        )}
-        
-        {/* Animated Icons */}
-        <div className="relative w-6 h-6 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            {isOpen ? (
-              <motion.div
-                key="close-icon"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <X className="w-6 h-6" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="chat-icon"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="flex items-center justify-center"
-              >
-                <MessageCircle className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.button>
-    </div>
+      <div className="fixed bottom-6 right-6 z-[110]">
+        <motion.button
+          onClick={togglePopup}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.95 }}
+          className={`relative w-14 h-14 rounded-full flex items-center justify-center cursor-pointer shadow-lg transition-all duration-300 border group select-none ${
+            isOpen 
+              ? 'bg-[#1A1C23] border-white/20 text-[#90EE90] shadow-[0_0_20px_rgba(144,238,144,0.15)]' 
+              : 'bg-[#90EE90] border-transparent text-black shadow-[0_4px_20px_rgba(144,238,144,0.3)] hover:shadow-[0_0_30px_rgba(144,238,144,0.5)] hover:bg-[#a3ffa3]'
+          }`}
+          aria-label="Bouton de contact"
+        >
+          {/* Pulsing ring when closed */}
+          {!isOpen && (
+            <span className="absolute -inset-0.5 rounded-full bg-[#90EE90]/40 animate-ping opacity-60 pointer-events-none" />
+          )}
+          
+          {/* Animated Icons */}
+          <div className="relative w-6 h-6 flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              {isOpen ? (
+                <motion.div
+                  key="close-icon"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <X className="w-6 h-6" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="chat-icon"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center justify-center"
+                >
+                  <MessageCircle className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.button>
+      </div>
+    </>
   );
 };
 

@@ -1,6 +1,36 @@
 import React from 'react';
 
-const Footer = () => {
+const FacebookIcon = ({ className }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const InstagramIcon = ({ className }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+
+const Footer = ({ contact, onNavigateAdmin }) => {
   return (
     <footer className="relative w-full overflow-hidden bg-[#0A0B10] z-30">
       {/* Background Image Layer */}
@@ -27,11 +57,37 @@ const Footer = () => {
           {/* Brand & Description Column */}
           <div className="col-span-1 md:col-span-5 flex flex-col justify-start">
             <h3 className="text-xl font-bold tracking-widest text-[#0A0B10] uppercase mb-4">
-              ELECPRO
+              Elecpro-dz
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed max-w-sm">
-              Solutions électriques de premier choix, conçues pour la sécurité et l'énergie durable.
+            <p className="text-gray-600 text-sm leading-relaxed max-w-sm mb-6">
+              {contact?.description || "Solutions électriques de premier choix, conçues pour la sécurité et l'énergie durable."}
             </p>
+            
+            {/* Social media links */}
+            <div className="flex items-center gap-3">
+              {contact?.facebook && (
+                <a 
+                  href={contact.facebook} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-9 h-9 rounded-full bg-[#0A0B10]/5 text-[#0A0B10] hover:bg-[#0A0B10] hover:text-[#90EE90] flex items-center justify-center transition-all duration-300 shadow-sm border border-black/5 hover:scale-105"
+                  title="Facebook"
+                >
+                  <FacebookIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
+              {contact?.instagram && (
+                <a 
+                  href={contact.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-9 h-9 rounded-full bg-[#0A0B10]/5 text-[#0A0B10] hover:bg-[#0A0B10] hover:text-[#90EE90] flex items-center justify-center transition-all duration-300 shadow-sm border border-black/5 hover:scale-105"
+                  title="Instagram"
+                >
+                  <InstagramIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Spacer Column */}
@@ -95,6 +151,15 @@ const Footer = () => {
               <li>
                 <a href="#" className="text-gray-500 hover:text-black transition-colors font-medium">Conditions d'Utilisation</a>
               </li>
+              <li>
+                <a 
+                  href="/admin" 
+                  onClick={(e) => { e.preventDefault(); onNavigateAdmin?.(); }} 
+                  className="text-gray-500 hover:text-[#90EE90] hover:bg-black/5 px-2 py-1 rounded transition-colors font-semibold border border-transparent hover:border-[#90EE90]/20"
+                >
+                  Administration
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -104,13 +169,13 @@ const Footer = () => {
         <div className="pt-8 border-t border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {/* Custom Circular Badge matching the header logo but styled in black & green */}
-            <div className="w-9 h-9 rounded-full bg-[#0A0B10] flex items-center justify-center shadow-md">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#90EE90] to-green-600 flex items-center justify-center">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#0A0B10]"></div>
-              </div>
-            </div>
+            <img 
+              src="/ousamalogo.png" 
+              alt="Logo" 
+              className="w-9 h-9 object-contain" 
+            />
             <span className="text-xs text-gray-400 font-medium ml-2">
-              © {new Date().getFullYear()} elecpro. Tous droits réservés.
+              © {new Date().getFullYear()} Elecpro-dz. Tous droits réservés.
             </span>
           </div>
         </div>

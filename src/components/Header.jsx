@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StaggeredMenu from './StaggeredMenu';
 
-const Header = ({ currentServiceId, onNavigateHome, startAnimation }) => {
+const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -27,11 +27,17 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation }) => {
     { label: 'Portfolio', ariaLabel: 'Voir notre portfolio', link: '#portfolio' },
   ];
 
-  const socialItems = [
-    { label: 'Instagram', link: 'https://instagram.com' },
-    { label: 'Facebook', link: 'https://facebook.com' },
-    { label: 'LinkedIn', link: 'https://linkedin.com' }
-  ];
+  const socialItems = [];
+  if (contact?.instagram) {
+    socialItems.push({ label: 'Instagram', link: contact.instagram });
+  } else {
+    socialItems.push({ label: 'Instagram', link: 'https://instagram.com' });
+  }
+  if (contact?.facebook) {
+    socialItems.push({ label: 'Facebook', link: contact.facebook });
+  } else {
+    socialItems.push({ label: 'Facebook', link: 'https://facebook.com' });
+  }
 
   return (
     <>
@@ -49,10 +55,12 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation }) => {
             onClick={(e) => handleNavLinkClick(e, '#')}
             className="flex items-center gap-2 pointer-events-auto cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#90EE90] to-green-800 flex items-center justify-center">
-              <div className="w-4 h-4 rounded-full bg-[#0A0B10]"></div>
-            </div>
-            <span className="font-semibold text-lg tracking-wide text-white font-sans">Elecpro</span>
+            <img 
+              src="/ousamalogo.png" 
+              alt="Logo" 
+              className="w-8 h-8 object-contain" 
+            />
+            <span className="font-semibold text-lg tracking-wide text-white font-sans">Elecpro-dz</span>
           </div>
           
           {/* Desktop Nav */}

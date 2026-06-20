@@ -4,8 +4,8 @@ import { projectsData } from '../data/projectsData';
 import Footer from '../components/Footer';
 import ImageSlider from '../components/ImageSlider';
 
-const ProjectDetails = ({ projectId, onBack, onSelectProject }) => {
-  const data = projectsData[projectId];
+const ProjectDetails = ({ projectId, onBack, onSelectProject, projects = projectsData }) => {
+  const data = projects[projectId];
 
   // Scroll to top when project changes
   useEffect(() => {
@@ -28,10 +28,10 @@ const ProjectDetails = ({ projectId, onBack, onSelectProject }) => {
   }
 
   // Find next project for quick navigation at the bottom
-  const projectIds = Object.keys(projectsData);
+  const projectIds = Object.keys(projects);
   const currentIndex = projectIds.indexOf(projectId);
   const nextProjectId = projectIds[(currentIndex + 1) % projectIds.length];
-  const nextProject = projectsData[nextProjectId];
+  const nextProject = projects[nextProjectId];
 
   // Prepare slider images
   const sliderImages = data.gallery && data.gallery.length > 0 ? data.gallery : [data.image];

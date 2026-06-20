@@ -6,14 +6,18 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const Portfolio = ({ onSelectProject }) => {
+const Portfolio = ({ onSelectProject, projects, onSeeMore }) => {
   const containerRef = useRef(null);
-  const projects = [
-    { id: "lighting", title: "Installation d'Éclairage Commercial", category: "Commercial", image: "/pic1.jpg" },
-    { id: "wiring", title: "Mise à Niveau du Câblage Résidentiel", category: "Résidentiel", image: "/pic2.jpg" },
-    { id: "switchboard", title: "Installation de Tableaux Industriels", category: "Industriel", image: "/pic3.jpg" },
-    { id: "domotics", title: "Intégration Domotique Résidentielle", category: "Systèmes Intelligents", image: "/pic4.png" }
-  ];
+  const projectsArray = projects 
+    ? (Array.isArray(projects) ? projects : Object.values(projects)) 
+    : [
+        { id: "lighting", title: "Installation d'Éclairage Commercial", category: "Commercial", image: "/pic1.jpg" },
+        { id: "wiring", title: "Mise à Niveau du Câblage Résidentiel", category: "Résidentiel", image: "/pic2.jpg" },
+        { id: "switchboard", title: "Installation de Tableaux Industriels", category: "Industriel", image: "/pic3.jpg" },
+        { id: "domotics", title: "Intégration Domotique Résidentielle", category: "Systèmes Intelligents", image: "/pic4.png" }
+      ];
+
+  const projectsLimit = projectsArray.slice(0, 4);
 
   useGSAP(() => {
     const cards = gsap.utils.toArray('.portfolio-card');
@@ -93,7 +97,7 @@ const Portfolio = ({ onSelectProject }) => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {projects.map((project, index) => (
+          {projectsLimit.map((project, index) => (
             <div 
               key={index} 
               onClick={() => onSelectProject?.(project.id)}
@@ -114,6 +118,18 @@ const Portfolio = ({ onSelectProject }) => {
             </div>
           ))}
         </div>
+
+        {projectsArray.length > 4 && (
+          <div className="flex justify-center mt-12">
+            <button 
+              onClick={onSeeMore}
+              className="group flex items-center gap-2 px-8 py-3.5 bg-[#0A0B10] hover:bg-[#1A1C23] text-white font-bold rounded-full text-sm transition-all duration-300 shadow-md hover:shadow-xl hover:scale-105 cursor-pointer uppercase tracking-wider font-sans border border-black/5"
+            >
+              Voir plus de projets
+              <span className="translate-x-0 group-hover:translate-x-1 transition-transform inline-block">→</span>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
