@@ -18,38 +18,34 @@ const ContactPopup = ({ contact, isOpen: controlledIsOpen, setIsOpen: controlled
     ? whatsappNumber 
     : `https://wa.me/${whatsappNumber.replace(/[\s\+\-\(\)]/g, '')}`;
 
-  const viberNumber = contact?.viber || '+15551234567';
-  const viberUrl = viberNumber.startsWith('viber://') 
-    ? viberNumber 
-    : `viber://chat?number=%2B${viberNumber.replace(/[\s\+\-\(\)]/g, '')}`;
+  const messengerUrl = (() => {
+    const facebookUrl = contact?.facebook;
+    if (!facebookUrl) return 'https://m.me/elecpro';
+    try {
+      const cleanedUrl = facebookUrl.replace(/\/$/, '');
+      const idMatch = cleanedUrl.match(/profile\.php\?id=(\d+)/);
+      if (idMatch && idMatch[1]) {
+        return `https://m.me/${idMatch[1]}`;
+      }
+      const parts = cleanedUrl.split('/');
+      const lastPart = parts[parts.length - 1];
+      if (lastPart && lastPart !== 'facebook.com' && lastPart !== 'www.facebook.com' && lastPart !== 'facebook' && !lastPart.includes('?')) {
+        return `https://m.me/${lastPart}`;
+      }
+    } catch (e) {
+      console.error('Error parsing facebook url for messenger:', e);
+    }
+    return 'https://m.me/elecpro';
+  })();
 
-  const telegramUsername = contact?.telegram || 'elecpro_admin';
-  const telegramUrl = telegramUsername.startsWith('http') 
-    ? telegramUsername 
-    : `https://t.me/${telegramUsername.replace(/@/g, '')}`;
-  const telegramLabel = telegramUsername.startsWith('@') 
-    ? telegramUsername 
-    : `@${telegramUsername}`;
-
-  // Custom Viber SVG Icon
-  const ViberIcon = () => (
+  // Custom Messenger SVG Icon
+  const MessengerIcon = () => (
     <svg 
       viewBox="0 0 24 24" 
       className="w-6 h-6 transition-transform group-hover:scale-110 duration-300"
       fill="currentColor"
     >
-      <path d="M11.398.002C9.473.028 5.331.344 3.014 2.467 1.294 4.177.693 6.698.623 9.82c-.06 3.11-.13 8.95 5.5 10.541v2.42s-.038.97.602 1.17c.79.25 1.24-.499 1.99-1.299l1.4-1.58c3.85.32 6.8-.419 7.14-.529.78-.25 5.181-.811 5.901-6.652.74-6.031-.36-9.831-2.34-11.551l-.01-.002c-.6-.55-3-2.3-8.37-2.32 0 0-.396-.025-1.038-.016zm.067 1.697c.545-.003.88.02.88.02 4.54.01 6.711 1.38 7.221 1.84 1.67 1.429 2.528 4.856 1.9 9.892-.6 4.88-4.17 5.19-4.83 5.4-.28.09-2.88.73-6.152.52 0 0-2.439 2.941-3.199 3.701-.12.13-.26.17-.35.15-.13-.03-.17-.19-.16-.41l.02-4.019c-4.771-1.32-4.491-6.302-4.441-8.902.06-2.6.55-4.732 2-6.172 1.957-1.77 5.475-2.01 7.11-2.02zm.36 2.6a.299.299 0 0 0-.3.299.3.3 0 0 0 .3.3 5.631 5.631 0 0 1 4.03 1.59c1.09 1.06 1.621 2.48 1.641 4.34a.3.3 0 0 0 .3.3v-.009a.3.3 0 0 0 .3-.3 6.451 6.451 0 0 0-1.81-4.76c-1.19-1.16-2.692-1.76-4.462-1.76zm-3.954.69a.955.955 0 0 0-.615.12h-.012c-.41.24-.788.54-1.148.94-.27.32-.421.639-.461.949a1.24 1.24 0 0 0 .05.541l.02.01a13.722 13.722 0 0 0 1.2 2.6 15.383 15.383 0 0 0 2.32 3.171l.03.04.04.03.03.03.03.03a15.603 15.603 0 0 0 3.18 2.33c1.32.72 2.122 1.06 2.602 1.2v.01c.14.04.268.06.398.06a1.84 1.84 0 0 0 1.102-.472c.39-.35.7-.738.93-1.148v-.01c.23-.43.15-.841-.18-1.121a13.632 13.632 0 0 0-2.15-1.54c-.51-.28-1.03-.11-1.24.17l-.45.569c-.23.28-.65.24-.65.24l-.012.01c-3.12-.8-3.95-3.959-3.95-3.959s-.04-.43.25-.65l.56-.45c.27-.22.46-.74.17-1.25a13.522 13.522 0 0 0-1.54-2.15.843.843 0 0 0-.504-.3zm4.473.89a.3.3 0 0 0 .002.6 3.78 3.78 0 0 1 2.65 1.15 3.5 3.5 0 0 1 .9 2.57.3.3 0 0 0 .3.299l.01.012a.3.3 0 0 0 .3-.301c.03-1.19-.34-2.19-1.07-2.99-.73-.8-1.75-1.25-3.05-1.34a.3.3 0 0 0-.042 0zm.49 1.619a.305.305 0 0 0-.018.611c.99.05 1.47.55 1.53 1.58a.3.3 0 0 0 .3.29h.01a.3.3 0 0 0 .29-.32c-.07-1.34-.8-2.091-2.1-2.161a.305.305 0 0 0-.012 0z"/>
-    </svg>
-  );
-
-  // Custom Telegram SVG Icon
-  const TelegramIcon = () => (
-    <svg 
-      viewBox="0 0 24 24" 
-      className="w-6 h-6 transition-transform group-hover:scale-110 duration-300"
-      fill="currentColor"
-    >
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.24-5.54 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.24.36-.49.99-.75 3.87-1.68 6.45-2.79 7.74-3.32 3.68-1.51 4.44-1.78 4.94-1.79.11 0 .36.03.52.16.14.12.18.28.2.42.02.13.02.26 0 .39z"/>
+      <path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.9 1.14 5.38 3.02 7.08.15.14.24.34.24.55l-.04 2.1c-.02.66.63 1.13 1.23.85l2.42-1.11c.17-.08.36-.09.53-.04 1.15.35 2.37.54 3.63.54 5.64 0 10-4.13 10-9.7C22 6.13 17.64 2 12 2zm1.09 12.82l-2.61-2.77-5.08 2.77c-.49.27-1.06-.27-.79-.76l2.81-5.12 2.61 2.77 5.08-2.77c.49-.27 1.06.27.79.76l-2.81 5.12z" />
     </svg>
   );
 
@@ -138,42 +134,24 @@ const ContactPopup = ({ contact, isOpen: controlledIsOpen, setIsOpen: controlled
                   <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
                 </a>
 
-                {/* Viber Channel */}
+                {/* Messenger Channel */}
                 <a 
-                  href={viberUrl}
-                  className="group flex items-center justify-between p-4 bg-[#7360F2]/5 hover:bg-[#7360F2]/15 border border-[#7360F2]/20 hover:border-[#7360F2]/40 rounded-xl transition-all duration-300 cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#7360F2]/25 flex items-center justify-center text-[#7360F2] shadow-[0_0_15px_rgba(115,96,242,0.15)] group-hover:scale-105 transition-transform duration-300">
-                      <ViberIcon />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Viber</h4>
-                      <p className="text-xs text-gray-400">Discuter instantanément</p>
-                    </div>
-                  </div>
-                  <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-                </a>
-
-                {/* Telegram Channel */}
-                <a 
-                  href={telegramUrl}
+                  href={messengerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center justify-between p-4 bg-[#24A1DE]/5 hover:bg-[#24A1DE]/15 border border-[#24A1DE]/20 hover:border-[#24A1DE]/40 rounded-xl transition-all duration-300 cursor-pointer"
+                  className="group flex items-center justify-between p-4 bg-[#0084FF]/5 hover:bg-[#0084FF]/15 border border-[#0084FF]/20 hover:border-[#0084FF]/40 rounded-xl transition-all duration-300 cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-[#24A1DE]/25 flex items-center justify-center text-[#24A1DE] shadow-[0_0_15px_rgba(36,161,222,0.15)] group-hover:scale-105 transition-transform duration-300">
-                      <TelegramIcon />
+                    <div className="w-12 h-12 rounded-xl bg-[#0084FF]/25 flex items-center justify-center text-[#0084FF] shadow-[0_0_15px_rgba(0,132,255,0.15)] group-hover:scale-105 transition-transform duration-300">
+                      <MessengerIcon />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Telegram</h4>
-                      <p className="text-xs text-gray-400 font-sans">{telegramLabel}</p>
+                      <h4 className="font-semibold text-white group-hover:text-[#90EE90] transition-colors duration-300">Messenger</h4>
+                      <p className="text-xs text-gray-400">Nous écrire sur Messenger</p>
                     </div>
                   </div>
                   <ArrowUpRight className="w-5 h-5 text-gray-500 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
                 </a>
-
               </div>
 
               {/* Subtle Footer Note */}

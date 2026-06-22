@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StaggeredMenu from './StaggeredMenu';
 
-const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact }) => {
+const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact, onLogin }) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -14,6 +14,11 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact }) =
   }, []);
 
   const handleNavLinkClick = (e, link) => {
+    if (link === '#admin') {
+      e.preventDefault();
+      if (onLogin) onLogin();
+      return;
+    }
     if (currentServiceId) {
       e.preventDefault();
       onNavigateHome(link);
@@ -25,6 +30,7 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact }) =
     { label: 'À propos', ariaLabel: 'En savoir plus sur nous', link: '#about' },
     { label: 'Services', ariaLabel: 'Voir nos services', link: '#services-section' },
     { label: 'Portfolio', ariaLabel: 'Voir notre portfolio', link: '#portfolio' },
+    { label: 'Connexion', ariaLabel: 'Se connecter à l\'administration', link: '#admin' },
   ];
 
   const socialItems = [];
@@ -73,10 +79,15 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact }) =
           
           {/* Desktop Actions */}
           <div className="flex items-center gap-6 text-sm pointer-events-auto">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors font-medium">Connexion</a>
-            <a href="#" className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white font-medium border border-white/5">
-              S'inscrire
-            </a>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                if (onLogin) onLogin();
+              }} 
+              className="text-gray-300 hover:text-white transition-colors font-medium cursor-pointer bg-transparent border-none"
+            >
+              Connexion
+            </button>
           </div>
         </div>
       </header>

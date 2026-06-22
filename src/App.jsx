@@ -328,6 +328,7 @@ const App = () => {
             onNavigateHome={handleNavigateHomeAndScroll} 
             startAnimation={startHeroAnimation || !isLoadingScreen}
             contact={contact}
+            onLogin={navigateToAdmin}
           />
           
           {currentServiceId && (
