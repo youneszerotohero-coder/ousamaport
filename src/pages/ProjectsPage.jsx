@@ -96,7 +96,7 @@ const ProjectsPage = ({ projects, onSelectProject, onBack }) => {
                 <img 
                   src={project.image} 
                   alt={project.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                  className="w-full h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-6 translate-y-3 group-hover:translate-y-0 transition-transform">
                   <span className="text-[#90EE90] text-xs font-bold uppercase tracking-wider mb-1">{project.category}</span>

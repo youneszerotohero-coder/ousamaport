@@ -276,15 +276,15 @@ const Hero = ({ onSelectService, startAnimation, onOpenContact, services }) => {
                                 <img
                                     src={service.image}
                                     alt={service.title}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
                                 />
-                                <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 opacity-0 translate-y-5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 transition-all duration-300">
                                     <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">{service.category}</span>
                                     <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-                                    <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 group-hover:line-clamp-none transition-all duration-300">
+                                    <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mb-4 transition-all duration-300">
                                         {service.tagline}
                                     </p>
-                                    <div className="h-0 opacity-0 group-hover:h-10 group-hover:opacity-100 overflow-hidden transition-all duration-300">
+                                    <div className="h-10 opacity-100 overflow-hidden transition-all duration-300">
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();

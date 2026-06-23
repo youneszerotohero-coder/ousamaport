@@ -7,7 +7,8 @@ import {
   fetchServices, fetchProjects, fetchContact, 
   createService, updateService, deleteService,
   createProject, updateProject, deleteProject,
-  updateContact, uploadImage, adminLogin
+  updateContact, uploadImage, adminLogin,
+  fetchProjectCategories, createProjectCategory
 } from '../lib/api';
 
 const ImageUploadInput = ({ label, value, onChange }) => {
@@ -73,7 +74,7 @@ const ImageUploadInput = ({ label, value, onChange }) => {
   );
 };
 
-const AdminDashboard = ({ onBack }) => {
+const AdminDashboard = ({ onBack, onDataChanged }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -85,6 +86,7 @@ const AdminDashboard = ({ onBack }) => {
   const [services, setServices] = useState({});
   const [projects, setProjects] = useState({});
   const [contact, setContact] = useState(null);
+  const [projectCategories, setProjectCategories] = useState([]);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -138,15 +140,17 @@ const AdminDashboard = ({ onBack }) => {
     setLoading(true);
     setError('');
     try {
-      const [sData, pData, cData] = await Promise.all([
+      const [sData, pData, cData, catData] = await Promise.all([
         fetchServices(),
         fetchProjects(),
-        fetchContact()
+        fetchContact(),
+        fetchProjectCategories()
       ]);
       setServices(sData);
       setProjects(pData);
       setContact(cData);
       setContactForm(cData);
+      setProjectCategories(catData || []);
     } catch (err) {
       setError('Erreur lors du chargement des données. Assurez-vous que le serveur backend est en cours d\'exécution.');
     } finally {
@@ -169,6 +173,7 @@ const AdminDashboard = ({ onBack }) => {
     try {
       const updated = await updateContact(contactForm);
       setContact(updated);
+      await onDataChanged?.();
       showSuccess('Informations de contact mises à jour avec succès !');
     } catch (err) {
       setError(err.message || 'Erreur lors de la mise à jour des contacts.');
@@ -271,6 +276,7 @@ const AdminDashboard = ({ onBack }) => {
         setServices(prev => ({ ...prev, [updated.id]: updated }));
         showSuccess(`Service "${updated.title}" mis à jour avec succès !`);
       }
+      await onDataChanged?.();
       setEditingItem(null);
       setServiceForm(null);
     } catch (err) {
@@ -290,6 +296,7 @@ const AdminDashboard = ({ onBack }) => {
         delete copy[id];
         return copy;
       });
+      await onDataChanged?.();
       showSuccess(`Service "${title}" supprimé.`);
     } catch (err) {
       setError(err.message || 'Impossible de supprimer le service.');
@@ -313,7 +320,8 @@ const AdminDashboard = ({ onBack }) => {
       challenge: '',
       solution: '',
       gallery: [],
-      testimonial: { quote: '', author: '', role: '' }
+      testimonial: { quote: '', author: '', role: '' },
+      serviceIds: []
     });
   };
 
@@ -322,7 +330,8 @@ const AdminDashboard = ({ onBack }) => {
     setProjectForm({
       ...project,
       gallery: project.gallery?.length ? [...project.gallery] : [],
-      testimonial: project.testimonial || { quote: '', author: '', role: '' }
+      testimonial: project.testimonial || { quote: '', author: '', role: '' },
+      serviceIds: project.serviceIds || []
     });
   };
 
@@ -354,6 +363,7 @@ const AdminDashboard = ({ onBack }) => {
         setProjects(prev => ({ ...prev, [updated.id]: updated }));
         showSuccess(`Projet "${updated.title}" mis à jour avec succès !`);
       }
+      await onDataChanged?.();
       setEditingItem(null);
       setProjectForm(null);
     } catch (err) {
@@ -373,6 +383,7 @@ const AdminDashboard = ({ onBack }) => {
         delete copy[id];
         return copy;
       });
+      await onDataChanged?.();
       showSuccess(`Projet "${title}" supprimé.`);
     } catch (err) {
       setError(err.message || 'Impossible de supprimer le projet.');
@@ -879,13 +890,46 @@ const AdminDashboard = ({ onBack }) => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Catégorie</label>
-                  <input 
-                    type="text" 
+                  <select 
                     required
                     value={projectForm.category}
                     onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value })}
-                    className="w-full bg-[#0A0B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#90EE90] transition"
-                  />
+                    className="w-full bg-[#0A0B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#90EE90] transition mb-2"
+                  >
+                    <option value="">Sélectionner une catégorie</option>
+                    {projectCategories.map((cat) => (
+                      <option key={cat.id || cat.name} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Nouvelle catégorie..."
+                      id="new-category-input"
+                      className="flex-1 bg-[#0A0B10]/50 border border-white/5 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#90EE90]"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const input = document.getElementById('new-category-input');
+                        const val = input?.value?.trim();
+                        if (!val) return;
+                        try {
+                          const newCat = await createProjectCategory(val);
+                          setProjectCategories(prev => [...prev, newCat]);
+                          setProjectForm({ ...projectForm, category: newCat.name });
+                          if (input) input.value = '';
+                        } catch (err) {
+                          alert(err.message || 'Impossible de créer la catégorie');
+                        }
+                      }}
+                      className="px-3 py-1.5 bg-[#90EE90] hover:bg-white text-black font-semibold rounded-lg text-xs transition cursor-pointer"
+                    >
+                      Ajouter
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1028,6 +1072,61 @@ const AdminDashboard = ({ onBack }) => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Associated Services selection */}
+              <div className="border-t border-white/5 pt-6">
+                <div className="mb-4">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">Services Connexes</h3>
+                  <p className="text-xs text-gray-400 mt-1">Sélectionnez les services associés à ce projet. Ce projet s'affichera dans le diaporama de ces services.</p>
+                </div>
+                {Object.keys(services).length === 0 ? (
+                  <div className="text-xs text-gray-500 bg-[#0A0B10] border border-white/10 rounded-xl p-4 text-center">
+                    Aucun service disponible. Créez d'abord des services dans l'onglet Services.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.values(services).map((srv) => {
+                      const isSelected = projectForm.serviceIds && projectForm.serviceIds.includes(srv.id);
+                      return (
+                        <div 
+                          key={srv.id}
+                          onClick={() => {
+                            const currentSrvIds = projectForm.serviceIds || [];
+                            const exists = currentSrvIds.includes(srv.id);
+                            let updated;
+                            if (exists) {
+                              updated = currentSrvIds.filter(id => id !== srv.id);
+                            } else {
+                              updated = [...currentSrvIds, srv.id];
+                            }
+                            setProjectForm({ ...projectForm, serviceIds: updated });
+                          }}
+                          className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all duration-300 ${
+                            isSelected 
+                              ? 'bg-[#90EE90]/10 border-[#90EE90] text-white shadow-lg shadow-[#90EE90]/5' 
+                              : 'bg-[#0A0B10] border-white/10 hover:border-white/20 text-gray-400'
+                          }`}
+                        >
+                          <img 
+                            src={srv.image} 
+                            alt={srv.title}
+                            className="w-12 h-12 rounded-lg object-cover border border-white/10 shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold truncate text-white">{srv.title}</h4>
+                            <p className="text-[10px] text-gray-500 truncate">{srv.category}</p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                            isSelected ? 'bg-[#90EE90] border-[#90EE90] text-black' : 'border-white/20'
+                          }`}>
+                            {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -21,7 +21,7 @@ const ProjectDetails = ({ projectId, onBack, onSelectProject, projects = project
           onClick={onBack}
           className="flex items-center gap-2 px-6 py-3 bg-[#90EE90] hover:bg-white transition-colors duration-300 text-black font-semibold rounded-xl"
         >
-          <ArrowLeft className="w-5 h-5" /> Retour au portfolio
+          <ArrowLeft className="w-5 h-5" /> Retour aux projets
         </button>
       </div>
     );
@@ -45,7 +45,7 @@ const ProjectDetails = ({ projectId, onBack, onSelectProject, projects = project
           className="group flex items-center gap-2 text-gray-400 hover:text-[#90EE90] transition-colors duration-300 font-medium text-sm"
         >
           <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-          <span>Retour au portfolio</span>
+          <span>Retour aux projets</span>
         </button>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#90EE90]"></span>

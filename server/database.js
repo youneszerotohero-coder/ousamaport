@@ -96,6 +96,29 @@ export const initDB = async () => {
     )
   `);
 
+  // Create Project Categories Table
+  await queryRun(`
+    CREATE TABLE IF NOT EXISTS project_categories (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE
+    )
+  `);
+
+  // Seed default project categories if empty
+  try {
+    const categoriesCount = await queryGet('SELECT COUNT(*) as count FROM project_categories');
+    if (categoriesCount && categoriesCount.count === 0) {
+      const defaults = ['Commercial', 'Résidentiel', 'Industriel', 'Systèmes Intelligents'];
+      for (const cat of defaults) {
+        const catId = cat.toLowerCase().replace(/[^a-z0-9]/g, '-');
+        await queryRun('INSERT INTO project_categories (id, name) VALUES (?, ?)', [catId, cat]);
+      }
+      console.log('Seeded default project categories.');
+    }
+  } catch (e) {
+    console.error('Error seeding project categories:', e.message);
+  }
+
   // Create Contact Details Table
   await queryRun(`
     CREATE TABLE IF NOT EXISTS contact_details (

@@ -29,7 +29,7 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact, onL
     { label: 'Accueil', ariaLabel: 'Aller à l\'accueil', link: '#' },
     { label: 'À propos', ariaLabel: 'En savoir plus sur nous', link: '#about' },
     { label: 'Services', ariaLabel: 'Voir nos services', link: '#services-section' },
-    { label: 'Portfolio', ariaLabel: 'Voir notre portfolio', link: '#portfolio' },
+    { label: 'Nos Projets', ariaLabel: 'Voir nos projets', link: '#portfolio' },
     { label: 'Connexion', ariaLabel: 'Se connecter à l\'administration', link: '#admin' },
   ];
 
@@ -74,7 +74,7 @@ const Header = ({ currentServiceId, onNavigateHome, startAnimation, contact, onL
             <a href="#" onClick={(e) => handleNavLinkClick(e, '#')} className="hover:text-white transition-colors">Accueil</a>
             <a href="#about" onClick={(e) => handleNavLinkClick(e, '#about')} className="hover:text-white transition-colors">À propos</a>
             <a href="#services-section" onClick={(e) => handleNavLinkClick(e, '#services-section')} className="hover:text-white transition-colors">Services</a>
-            <a href="#portfolio" onClick={(e) => handleNavLinkClick(e, '#portfolio')} className="hover:text-white transition-colors">Portfolio</a>
+            <a href="#portfolio" onClick={(e) => handleNavLinkClick(e, '#portfolio')} className="hover:text-white transition-colors">Nos Projets</a>
           </nav>
           
           {/* Desktop Actions */}

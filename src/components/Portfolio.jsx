@@ -77,7 +77,7 @@ const Portfolio = ({ onSelectProject, projects, onSeeMore }) => {
           <div>
             <div className="flex flex-col mb-4">
               <SplitText
-                text="Notre"
+                text="Nos"
                 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-[#0A0B10] leading-[1.1] mb-2"
                 tag="h2"
                 textAlign="left"
@@ -85,7 +85,7 @@ const Portfolio = ({ onSelectProject, projects, onSeeMore }) => {
                 duration={1.1}
               />
               <SplitText
-                text="Portfolio"
+                text="Projets"
                 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-green-600 leading-[1.1]"
                 tag="h2"
                 textAlign="left"
@@ -106,7 +106,7 @@ const Portfolio = ({ onSelectProject, projects, onSeeMore }) => {
               <img 
                 src={project.image} 
                 alt={project.title} 
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
                 <span className="text-[#90EE90] text-sm font-medium mb-1">{project.category}</span>

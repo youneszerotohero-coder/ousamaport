@@ -3,6 +3,45 @@ import { projectsData } from '../data/projectsData';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+const normalizeUploadUrl = (value) => {
+  if (typeof value !== 'string') return value;
+
+  if (value.startsWith('/uploads/')) return value;
+
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.pathname.startsWith('/uploads/')) {
+      return url.pathname;
+    }
+  } catch {
+    // Not a valid absolute URL; keep the original value.
+  }
+
+  return value;
+};
+
+const normalizeService = (service) => ({
+  ...service,
+  image: normalizeUploadUrl(service.image),
+  projects: Array.isArray(service.projects)
+    ? service.projects.map(project => ({
+        ...project,
+        image: normalizeUploadUrl(project.image)
+      }))
+    : service.projects,
+  gallery: Array.isArray(service.gallery)
+    ? service.gallery.map(normalizeUploadUrl)
+    : service.gallery
+});
+
+const normalizeProject = (project) => ({
+  ...project,
+  image: normalizeUploadUrl(project.image),
+  gallery: Array.isArray(project.gallery)
+    ? project.gallery.map(normalizeUploadUrl)
+    : project.gallery
+});
+
 // Helper to convert arrays back into keyed objects
 const toObject = (arr) => {
   return arr.reduce((acc, item) => {
@@ -16,7 +55,7 @@ export const fetchServices = async () => {
     const res = await fetch(`${API_BASE_URL}/services`);
     if (!res.ok) throw new Error('Failed to fetch services');
     const data = await res.json();
-    return toObject(data);
+    return toObject(data.map(normalizeService));
   } catch (error) {
     console.warn('Backend offline or services fetch failed, falling back to static data:', error);
     return servicesData;
@@ -28,7 +67,7 @@ export const fetchProjects = async () => {
     const res = await fetch(`${API_BASE_URL}/projects`);
     if (!res.ok) throw new Error('Failed to fetch projects');
     const data = await res.json();
-    return toObject(data);
+    return toObject(data.map(normalizeProject));
   } catch (error) {
     console.warn('Backend offline or projects fetch failed, falling back to static data:', error);
     return projectsData;
@@ -175,4 +214,33 @@ export const adminLogin = async (username, password) => {
     throw new Error(errData.error || 'Identifiants invalides');
   }
   return await res.json(); // { success: true, token: '...', username: '...' }
+};
+
+export const fetchProjectCategories = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/project-categories`);
+    if (!res.ok) throw new Error('Failed to fetch project categories');
+    return await res.json();
+  } catch (error) {
+    console.warn('Backend offline or project categories fetch failed, returning defaults:', error);
+    return [
+      { id: 'commercial', name: 'Commercial' },
+      { id: 'residentiel', name: 'Résidentiel' },
+      { id: 'industriel', name: 'Industriel' },
+      { id: 'systemes-intelligents', name: 'Systèmes Intelligents' }
+    ];
+  }
+};
+
+export const createProjectCategory = async (name) => {
+  const res = await fetch(`${API_BASE_URL}/project-categories`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  });
+  if (!res.ok) {
+    const errData = await res.json();
+    throw new Error(errData.error || 'Failed to create project category');
+  }
+  return await res.json();
 };

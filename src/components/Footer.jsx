@@ -106,7 +106,7 @@ const Footer = ({ contact, onNavigateAdmin }) => {
                 <a href="#about" className="text-gray-500 hover:text-black transition-colors font-medium">À Propos</a>
               </li>
               <li>
-                <a href="#portfolio" className="text-gray-500 hover:text-black transition-colors font-medium">Portfolio</a>
+                <a href="#portfolio" className="text-gray-500 hover:text-black transition-colors font-medium">Nos Projets</a>
               </li>
               <li>
                 <a href="#contact" className="text-gray-500 hover:text-black transition-colors font-medium">Contact</a>

@@ -38,6 +38,21 @@ const App = () => {
   const isAdminRef = useRef(false);
   const isProjectsPageRef = useRef(false);
 
+  const loadAllData = async () => {
+    try {
+      const [sData, pData, cData] = await Promise.all([
+        fetchServices(),
+        fetchProjects(),
+        fetchContact()
+      ]);
+      setServices(sData);
+      setProjects(pData);
+      setContact(cData);
+    } catch (err) {
+      console.error('Failed to load portfolio database data:', err);
+    }
+  };
+
   useEffect(() => {
     currentServiceIdRef.current = currentServiceId;
     currentProjectIdRef.current = currentProjectId;
@@ -47,20 +62,6 @@ const App = () => {
 
   // Load database data on mount
   useEffect(() => {
-    const loadAllData = async () => {
-      try {
-        const [sData, pData, cData] = await Promise.all([
-          fetchServices(),
-          fetchProjects(),
-          fetchContact()
-        ]);
-        setServices(sData);
-        setProjects(pData);
-        setContact(cData);
-      } catch (err) {
-        console.error('Failed to load portfolio database data:', err);
-      }
-    };
     loadAllData();
   }, []);
 
@@ -320,7 +321,7 @@ const App = () => {
       )}
 
       {isAdmin ? (
-        <AdminDashboard onBack={navigateFromAdmin} />
+        <AdminDashboard onBack={navigateFromAdmin} onDataChanged={loadAllData} />
       ) : (
         <>
           <Header 

@@ -58,14 +58,14 @@ const ImageSlider = ({ images = [] }) => {
         style={{ transform: `translate3d(-${currentIndex * 100}%, 0, 0)` }}
       >
         {images.map((imgSrc, idx) => (
-          <div key={idx} className="w-full h-full shrink-0 relative overflow-hidden">
+          <div key={idx} className="w-full h-full shrink-0 relative overflow-hidden flex items-center justify-center">
             <img 
               src={imgSrc} 
               alt={`Slide ${idx + 1}`}
-              className="w-full h-full object-cover transition-transform duration-1000 scale-102 group-hover:scale-105"
+              className="w-full h-auto max-h-full transition-transform duration-1000 scale-102 group-hover:scale-105"
             />
             {/* Soft dark overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10]/80 via-transparent to-black/20"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10]/80 via-transparent to-black/20 pointer-events-none"></div>
           </div>
         ))}
       </div>
@@ -76,14 +76,14 @@ const ImageSlider = ({ images = [] }) => {
           <button 
             onClick={prevSlide}
             aria-label="Previous Slide"
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0B10]/60 hover:bg-[#90EE90] hover:text-black border border-white/10 hover:border-[#90EE90] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer hover:scale-105"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0B10]/60 hover:bg-[#90EE90] hover:text-black border border-white/10 hover:border-[#90EE90] text-white flex items-center justify-center opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer hover:scale-105"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button 
             onClick={nextSlide}
             aria-label="Next Slide"
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0B10]/60 hover:bg-[#90EE90] hover:text-black border border-white/10 hover:border-[#90EE90] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer hover:scale-105"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#0A0B10]/60 hover:bg-[#90EE90] hover:text-black border border-white/10 hover:border-[#90EE90] text-white flex items-center justify-center opacity-100 transition-all duration-300 backdrop-blur-md cursor-pointer hover:scale-105"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -103,16 +103,28 @@ const ImageSlider = ({ images = [] }) => {
 
         {/* Indicator dots */}
         <div className="flex gap-2">
-          {images.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => selectSlide(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                currentIndex === idx ? 'w-6 bg-[#90EE90]' : 'w-1.5 bg-gray-600 hover:bg-gray-400'
-              }`}
-            />
-          ))}
+          {(() => {
+            const getVisibleDots = () => {
+              if (slideCount <= 4) {
+                return Array.from({ length: slideCount }, (_, idx) => idx);
+              }
+              let start = 0;
+              if (currentIndex >= 2) {
+                start = Math.min(currentIndex - 1, slideCount - 4);
+              }
+              return Array.from({ length: 4 }, (_, idx) => start + idx);
+            };
+            return getVisibleDots().map((idx) => (
+              <button
+                key={idx}
+                onClick={() => selectSlide(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  currentIndex === idx ? 'w-6 bg-[#90EE90]' : 'w-1.5 bg-gray-600 hover:bg-gray-400'
+                }`}
+              />
+            ));
+          })()}
         </div>
       </div>
     </div>
