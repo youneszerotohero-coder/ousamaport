@@ -101,12 +101,12 @@ const Portfolio = ({ onSelectProject, projects, onSeeMore }) => {
             <div 
               key={index} 
               onClick={() => onSelectProject?.(project.id)}
-              className="portfolio-card group relative overflow-hidden rounded-2xl bg-[#1A1C23] border border-black/5 aspect-[4/3] shadow-lg hover:shadow-2xl cursor-pointer transition-shadow duration-500"
+              className="portfolio-card group relative overflow-hidden rounded-2xl bg-[#1A1C23] border border-black/5 aspect-[4/3] shadow-lg hover:shadow-2xl cursor-pointer transition-shadow duration-500 flex items-center justify-center"
             >
               <img 
                 src={project.image} 
                 alt={project.title} 
-                className="w-full h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                className="max-w-full max-h-full w-auto h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0 transition-transform">
                 <span className="text-[#90EE90] text-sm font-medium mb-1">{project.category}</span>

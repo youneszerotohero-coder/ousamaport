@@ -62,7 +62,7 @@ const ImageSlider = ({ images = [] }) => {
             <img 
               src={imgSrc} 
               alt={`Slide ${idx + 1}`}
-              className="w-full h-auto max-h-full transition-transform duration-1000 scale-102 group-hover:scale-105"
+              className="max-w-full max-h-full w-auto h-auto transition-transform duration-1000 scale-102 group-hover:scale-105"
             />
             {/* Soft dark overlays */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0B10]/80 via-transparent to-black/20 pointer-events-none"></div>

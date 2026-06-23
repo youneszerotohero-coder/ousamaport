@@ -91,12 +91,12 @@ const ProjectsPage = ({ projects, onSelectProject, onBack }) => {
               <div
                 key={project.id}
                 onClick={() => onSelectProject?.(project.id)}
-                className="project-card group relative overflow-hidden rounded-2xl bg-[#161822]/60 border border-white/15 aspect-[4/3] shadow-lg hover:shadow-2xl cursor-pointer transition-shadow duration-500"
+                className="project-card group relative overflow-hidden rounded-2xl bg-[#161822]/60 border border-white/15 aspect-[4/3] shadow-lg hover:shadow-2xl cursor-pointer transition-shadow duration-500 flex items-center justify-center"
               >
                 <img 
                   src={project.image} 
                   alt={project.title} 
-                  className="w-full h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                  className="max-w-full max-h-full w-auto h-auto transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent flex flex-col justify-end p-6 translate-y-3 group-hover:translate-y-0 transition-transform">
                   <span className="text-[#90EE90] text-xs font-bold uppercase tracking-wider mb-1">{project.category}</span>

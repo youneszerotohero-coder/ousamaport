@@ -270,13 +270,13 @@ const Hero = ({ onSelectService, startAnimation, onOpenContact, services }) => {
                                     isEntranceFinished 
                                         ? '' 
                                         : (startAnimation ? 'animate-hero-image' : 'opacity-0 pointer-events-none')
-                                }`}
+                                } flex items-center justify-center`}
                                 style={styleConfig.style}
                             >
                                 <img
                                     src={service.image}
                                     alt={service.title}
-                                    className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
+                                    className="max-w-full max-h-full w-auto h-auto transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="service-overlay absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-6 transition-all duration-300">
                                     <span className="text-[#90EE90] text-xs font-semibold tracking-widest uppercase mb-1">{service.category}</span>
